@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-luau",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Luau grammar for tree-sitter",
   "main": "bindings/node",
   "keywords": [
