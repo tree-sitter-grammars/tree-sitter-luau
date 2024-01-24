@@ -148,6 +148,7 @@ module.exports = grammar(lua, {
       $.field_type,
       $.union_type,
       $.optional_type,
+      $.literal_type,
     )),
 
     builtin_type: _ => choice(
@@ -201,6 +202,8 @@ module.exports = grammar(lua, {
     intersection_type: $ => prec.left(2, seq($.type, '&', $.type)),
 
     optional_type: $ => seq($.type, '?'),
+
+    literal_type: $ => choice($.string, $.true, $.false),
 
     expression: ($, original) => choice(
       ...original.members.filter(member => member.name !== 'unary_expression'),
