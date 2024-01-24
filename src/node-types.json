@@ -66,6 +66,10 @@
         "named": true
       },
       {
+        "type": "unary_expression",
+        "named": true
+      },
+      {
         "type": "vararg_expression",
         "named": true
       },
@@ -1366,6 +1370,22 @@
     }
   },
   {
+    "type": "unary_expression",
+    "named": true,
+    "fields": {
+      "operand": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "union_type",
     "named": true,
     "fields": {},
@@ -1822,10 +1842,6 @@
   },
   {
     "type": "}",
-    "named": false
-  },
-  {
-    "type": "~",
     "named": false
   },
   {
