@@ -18,19 +18,19 @@ grammar to a tree-sitter [Parser][], and then use the parser to parse some code:
 ```rust
 let code = r#"
 function foo(x: number, y: string): boolean
-	local k = (y :: string):rep(x)
-	local foo: (number, string) -> boolean
+    local k = (y :: string):rep(x)
+    local foo: (number, string) -> boolean
 
-	local no_returns: (number, string) -> ()
-	local returns_boolean_and_string: (number, string) -> (boolean, string)
+    local no_returns: (number, string) -> ()
+    local returns_boolean_and_string: (number, string) -> (boolean, string)
 
-	local a = "hi"
-	local b = `bye {no_returns}`
+    local a = "hi"
+    local b = `bye {no_returns}`
 end
 
 export type Point = {
-	x: number,
-	y: number,
+    x: number,
+    y: number,
 }
 "#;
 let mut parser = Parser::new();
