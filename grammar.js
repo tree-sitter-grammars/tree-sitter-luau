@@ -182,11 +182,12 @@ module.exports = grammar(lua, {
 
     object_type: $ => seq(
       '{',
-      commaSep1(seq(
-        choice($.identifier, $.object_field_type),
-        ':',
-        $.type,
-      )),
+      choice(
+        commaSep1(
+          seq(choice($.identifier, $.object_field_type), ':', $.type),
+        ),
+        commaSep1($.type),
+      ),
       optional(','),
       '}',
     ),
