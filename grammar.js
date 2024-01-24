@@ -25,7 +25,6 @@ const PREC = {
   PLUS: 9, // + -
   MULTI: 10, // * / // %
   CAST: 11, // ::
-  UNARY: 12, // not # - ~
   POWER: 13, // ^
 };
 
@@ -152,10 +151,14 @@ module.exports = grammar(lua, {
     )),
 
     builtin_type: _ => choice(
+      'thread',
+      'buffer',
       'any',
+      'userdata',
+      'unknown',
+      'never',
       'string',
       'number',
-      'integer',
       'table',
       'boolean',
       'nil',
@@ -200,7 +203,7 @@ module.exports = grammar(lua, {
     optional_type: $ => seq($.type, '?'),
 
     expression: ($, original) => choice(
-      ...original.members,
+      ...original.members.filter(member => member.name !== 'unary_expression'),
       $.cast_expression,
       $.if_expression,
     ),
