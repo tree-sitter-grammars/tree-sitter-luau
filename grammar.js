@@ -267,11 +267,11 @@ module.exports = grammar(lua, {
       field('condition', $.expression),
       'then',
       field('consequence', $.expression),
-      repeat($.else_if_clause),
+      repeat($.elseif_clause),
       optional($.else_clause),
     )),
 
-    else_if_clause: $ => seq(
+    elseif_clause: $ => seq(
       'elseif',
       field('condition', $.expression),
       'then',
