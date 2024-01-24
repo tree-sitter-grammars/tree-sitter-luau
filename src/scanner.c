@@ -1,5 +1,5 @@
 #include "tree_sitter/parser.h"
-#include <stdio.h>
+
 #include <wctype.h>
 
 enum TokenType {
@@ -56,29 +56,26 @@ void *tree_sitter_luau_external_scanner_create() {
 }
 
 void tree_sitter_luau_external_scanner_destroy(void *payload) {
-	Scanner *scanner = (Scanner *)payload;
-	free(scanner);
+    Scanner *scanner = (Scanner *)payload;
+    free(scanner);
 }
 
-unsigned tree_sitter_luau_external_scanner_serialize(void *payload,
-                                                     char *buffer) {
+unsigned tree_sitter_luau_external_scanner_serialize(void *payload, char *buffer) {
     Scanner *scanner = (Scanner *)payload;
     buffer[0] = scanner->ending_char;
     buffer[1] = (char)scanner->level_count;
     return 2;
 }
 
-void tree_sitter_luau_external_scanner_deserialize(void *payload,
-                                                   const char *buffer,
-                                                   unsigned length) {
+void tree_sitter_luau_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
     Scanner *scanner = (Scanner *)payload;
     if (length == 0) {
         return;
-	}
+    }
     scanner->ending_char = buffer[0];
     if (length == 1) {
         return;
-}
+    }
     scanner->level_count = buffer[1];
 }
 
@@ -191,8 +188,7 @@ static bool scan_string_content(Scanner *scanner, TSLexer *lexer) {
         return scan_block_content(scanner, lexer);
     }
 
-    while (lexer->lookahead != '\n' && lexer->lookahead != 0 &&
-           lexer->lookahead != scanner->ending_char) {
+    while (lexer->lookahead != '\n' && lexer->lookahead != 0 && lexer->lookahead != scanner->ending_char) {
         if (consume_char('\\', lexer) && consume_char('z', lexer)) {
             while (iswspace(lexer->lookahead)) {
                 consume(lexer);
@@ -210,8 +206,7 @@ static bool scan_string_content(Scanner *scanner, TSLexer *lexer) {
     return true;
 }
 
-bool tree_sitter_luau_external_scanner_scan(void *payload, TSLexer *lexer,
-                                            const bool *valid_symbols) {
+bool tree_sitter_luau_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     Scanner *scanner = (Scanner *)payload;
     if (valid_symbols[STRING_END] && scan_string_end(scanner, lexer)) {
         reset_state(scanner);
@@ -224,15 +219,13 @@ bool tree_sitter_luau_external_scanner_scan(void *payload, TSLexer *lexer,
         return true;
     }
 
-    if (valid_symbols[BLOCK_COMMENT_END] && scanner->ending_char == 0 &&
-        scan_block_end(scanner, lexer)) {
+    if (valid_symbols[BLOCK_COMMENT_END] && scanner->ending_char == 0 && scan_block_end(scanner, lexer)) {
         reset_state(scanner);
         lexer->result_symbol = BLOCK_COMMENT_END;
         return true;
     }
 
-    if (valid_symbols[BLOCK_COMMENT_CONTENT] &&
-        scan_comment_content(scanner, lexer)) {
+    if (valid_symbols[BLOCK_COMMENT_CONTENT] && scan_comment_content(scanner, lexer)) {
         return true;
     }
 

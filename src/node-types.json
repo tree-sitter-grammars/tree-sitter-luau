@@ -66,10 +66,6 @@
         "named": true
       },
       {
-        "type": "unary_expression",
-        "named": true
-      },
-      {
         "type": "vararg_expression",
         "named": true
       },
@@ -336,11 +332,11 @@
     "fields": {
       "content": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "comment_content",
-            "named": false
+            "named": true
           }
         ]
       },
@@ -349,7 +345,7 @@
         "required": false,
         "types": [
           {
-            "type": "comment_end",
+            "type": "]]",
             "named": false
           }
         ]
@@ -359,7 +355,11 @@
         "required": true,
         "types": [
           {
-            "type": "comment_start",
+            "type": "--",
+            "named": false
+          },
+          {
+            "type": "[[",
             "named": false
           }
         ]
@@ -433,7 +433,23 @@
     }
   },
   {
-    "type": "else_if_clause",
+    "type": "else_statement",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "elseif_clause",
     "named": true,
     "fields": {
       "condition": {
@@ -452,22 +468,6 @@
         "types": [
           {
             "type": "expression",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "else_statement",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
             "named": true
           }
         ]
@@ -899,7 +899,7 @@
           "named": true
         },
         {
-          "type": "else_if_clause",
+          "type": "elseif_clause",
           "named": true
         }
       ]
@@ -955,6 +955,29 @@
       "types": [
         {
           "type": "expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "literal_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "false",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "true",
           "named": true
         }
       ]
@@ -1156,10 +1179,6 @@
         "types": [
           {
             "type": "string_content",
-            "named": false
-          },
-          {
-            "type": "string_content",
             "named": true
           }
         ]
@@ -1169,7 +1188,15 @@
         "required": false,
         "types": [
           {
-            "type": "string_end",
+            "type": "\"",
+            "named": false
+          },
+          {
+            "type": "'",
+            "named": false
+          },
+          {
+            "type": "]]",
             "named": false
           }
         ]
@@ -1179,7 +1206,15 @@
         "required": false,
         "types": [
           {
-            "type": "string_start",
+            "type": "\"",
+            "named": false
+          },
+          {
+            "type": "'",
+            "named": false
+          },
+          {
+            "type": "[[",
             "named": false
           }
         ]
@@ -1203,7 +1238,17 @@
   {
     "type": "string_content",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "escape_sequence",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "table_constructor",
@@ -1268,6 +1313,10 @@
           "named": true
         },
         {
+          "type": "literal_type",
+          "named": true
+        },
+        {
           "type": "object_type",
           "named": true
         },
@@ -1314,22 +1363,6 @@
           "named": true
         }
       ]
-    }
-  },
-  {
-    "type": "unary_expression",
-    "named": true,
-    "fields": {
-      "operand": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "expression",
-            "named": true
-          }
-        ]
-      }
     }
   },
   {
@@ -1448,6 +1481,10 @@
     }
   },
   {
+    "type": "\"",
+    "named": false
+  },
+  {
     "type": "#",
     "named": false
   },
@@ -1461,6 +1498,10 @@
   },
   {
     "type": "&",
+    "named": false
+  },
+  {
+    "type": "'",
     "named": false
   },
   {
@@ -1493,6 +1534,10 @@
   },
   {
     "type": "-",
+    "named": false
+  },
+  {
+    "type": "--",
     "named": false
   },
   {
@@ -1572,11 +1617,19 @@
     "named": false
   },
   {
+    "type": "[[",
+    "named": false
+  },
+  {
     "type": "\\{",
     "named": false
   },
   {
     "type": "]",
+    "named": false
+  },
+  {
+    "type": "]]",
     "named": false
   },
   {
@@ -1608,16 +1661,12 @@
     "named": true
   },
   {
+    "type": "buffer",
+    "named": false
+  },
+  {
     "type": "comment_content",
-    "named": false
-  },
-  {
-    "type": "comment_end",
-    "named": false
-  },
-  {
-    "type": "comment_start",
-    "named": false
+    "named": true
   },
   {
     "type": "continue_statement",
@@ -1680,11 +1729,11 @@
     "named": false
   },
   {
-    "type": "integer",
+    "type": "local",
     "named": false
   },
   {
-    "type": "local",
+    "type": "never",
     "named": false
   },
   {
@@ -1720,23 +1769,15 @@
     "named": false
   },
   {
-    "type": "string_content",
-    "named": false
-  },
-  {
-    "type": "string_end",
-    "named": false
-  },
-  {
-    "type": "string_start",
-    "named": false
-  },
-  {
     "type": "table",
     "named": false
   },
   {
     "type": "then",
+    "named": false
+  },
+  {
+    "type": "thread",
     "named": false
   },
   {
@@ -1752,7 +1793,15 @@
     "named": false
   },
   {
+    "type": "unknown",
+    "named": false
+  },
+  {
     "type": "until",
+    "named": false
+  },
+  {
+    "type": "userdata",
     "named": false
   },
   {
