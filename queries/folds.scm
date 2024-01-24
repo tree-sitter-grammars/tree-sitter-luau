@@ -1,11 +1,2 @@
-[
-  (do_statement)
-  (while_statement)
-  (repeat_statement)
-  (if_statement)
-  (for_statement)
-  (function_declaration)
-  (function_definition)
-  (table_constructor)
-  (object_type)
-] @fold
+; inherits: lua
+(object_type) @fold
