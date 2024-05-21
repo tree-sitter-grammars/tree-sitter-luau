@@ -1,4 +1,7 @@
 {
+  "0": "l",
+  "1": "u",
+  "2": "a",
   "name": "luau",
   "word": "identifier",
   "rules": {
@@ -3010,6 +3013,10 @@
             {
               "type": "STRING",
               "value": "%="
+            },
+            {
+              "type": "STRING",
+              "value": "//="
             },
             {
               "type": "STRING",

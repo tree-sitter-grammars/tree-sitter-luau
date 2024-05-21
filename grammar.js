@@ -97,7 +97,7 @@ module.exports = grammar(lua, {
 
     update_statement: $ => seq(
       alias($._variable_assignment_varlist, $.variable_list),
-      choice('+=', '-=', '*=', '/=', '%=', '^=', '..='),
+      choice('+=', '-=', '*=', '/=', '%=', '//=', '^=', '..='),
       alias($._variable_assignment_explist, $.expression_list),
     ),
 
