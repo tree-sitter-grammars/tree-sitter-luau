@@ -84,6 +84,10 @@ const optional_block = $ => alias(optional($._block), $.block);
 module.exports = grammar(lua, {
   name: 'luau',
 
+  supertypes: ($, original) => original.concat([
+    $.type,
+  ]),
+
   rules: {
     // Luau has no goto and label statements, and has continue statements
     statement: ($, original) => choice(
@@ -121,13 +125,19 @@ module.exports = grammar(lua, {
       field('body', optional_block($)),
       'end',
     ),
-    generic_type_list: $ => seq('<', commaSep1($.identifier), '>'),
-    _parameter_list: $ => choice(
-      seq(commaSep1($.parameter), optional(seq(',', $.vararg_expression))),
-      $.vararg_expression,
+    generic_type_list: $ => seq(
+      '<',
+      commaSep1(
+        seq($.identifier, optional($.vararg_expression)),
+      ),
+      '>',
     ),
+    _parameter_list: $ => choice(commaSep1($.parameter)),
 
-    parameter: $ => seq($.identifier, optional(seq(':', $.type))),
+    parameter: $ => seq(
+      choice($.identifier, $.vararg_expression),
+      optional(seq(':', $.type)),
+    ),
 
     _att_name_list: $ => sep1(
       seq(
@@ -150,6 +160,7 @@ module.exports = grammar(lua, {
       $.union_type,
       $.optional_type,
       $.literal_type,
+      $.variadic_type,
     )),
 
     builtin_type: _ => choice(
@@ -206,6 +217,8 @@ module.exports = grammar(lua, {
     optional_type: $ => seq($.type, '?'),
 
     literal_type: $ => choice($.string, $.true, $.false),
+
+    variadic_type: $ => prec.right(seq('...', $.type)),
 
     expression: ($, original) => choice(
       original,

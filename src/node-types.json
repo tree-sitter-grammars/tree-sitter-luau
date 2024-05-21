@@ -138,6 +138,60 @@
     ]
   },
   {
+    "type": "type",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "builtin_type",
+        "named": true
+      },
+      {
+        "type": "empty_type",
+        "named": true
+      },
+      {
+        "type": "field_type",
+        "named": true
+      },
+      {
+        "type": "function_type",
+        "named": true
+      },
+      {
+        "type": "generic_type",
+        "named": true
+      },
+      {
+        "type": "identifier",
+        "named": true
+      },
+      {
+        "type": "literal_type",
+        "named": true
+      },
+      {
+        "type": "object_type",
+        "named": true
+      },
+      {
+        "type": "optional_type",
+        "named": true
+      },
+      {
+        "type": "tuple_type",
+        "named": true
+      },
+      {
+        "type": "union_type",
+        "named": true
+      },
+      {
+        "type": "variadic_type",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "variable",
     "named": true,
     "subtypes": [
@@ -825,10 +879,6 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
           "type": "type",
           "named": true
         }
@@ -843,10 +893,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
         {
           "type": "type",
           "named": true
@@ -864,6 +910,10 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "vararg_expression",
           "named": true
         }
       ]
@@ -1050,10 +1100,6 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
           "type": "object_field_type",
           "named": true
         },
@@ -1088,11 +1134,11 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
+          "type": "type",
           "named": true
         },
         {
-          "type": "type",
+          "type": "vararg_expression",
           "named": true
         }
       ]
@@ -1108,10 +1154,6 @@
       "types": [
         {
           "type": "parameter",
-          "named": true
-        },
-        {
-          "type": "vararg_expression",
           "named": true
         }
       ]
@@ -1285,61 +1327,6 @@
     }
   },
   {
-    "type": "type",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "builtin_type",
-          "named": true
-        },
-        {
-          "type": "empty_type",
-          "named": true
-        },
-        {
-          "type": "field_type",
-          "named": true
-        },
-        {
-          "type": "function_type",
-          "named": true
-        },
-        {
-          "type": "generic_type",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "literal_type",
-          "named": true
-        },
-        {
-          "type": "object_type",
-          "named": true
-        },
-        {
-          "type": "optional_type",
-          "named": true
-        },
-        {
-          "type": "tuple_type",
-          "named": true
-        },
-        {
-          "type": "union_type",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "type_definition",
     "named": true,
     "fields": {
@@ -1420,6 +1407,11 @@
     }
   },
   {
+    "type": "vararg_expression",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "variable_declaration",
     "named": true,
     "fields": {},
@@ -1466,6 +1458,21 @@
     "children": {
       "multiple": true,
       "required": false,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "variadic_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
       "types": [
         {
           "type": "type",
@@ -1574,6 +1581,10 @@
   },
   {
     "type": "..",
+    "named": false
+  },
+  {
+    "type": "...",
     "named": false
   },
   {
@@ -1770,11 +1781,11 @@
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "or",
@@ -1827,10 +1838,6 @@
   {
     "type": "userdata",
     "named": false
-  },
-  {
-    "type": "vararg_expression",
-    "named": true
   },
   {
     "type": "while",

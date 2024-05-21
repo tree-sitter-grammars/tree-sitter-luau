@@ -162,6 +162,8 @@
 ((identifier) @variable.builtin
   (#eq? @variable.builtin "self"))
 
+"..." @variable.builtin
+
 ((identifier) @module.builtin
   (#any-of? @module.builtin "_G" "debug" "io" "jit" "math" "os" "package" "string" "table" "utf8"))
 
