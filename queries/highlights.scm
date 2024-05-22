@@ -126,6 +126,7 @@
   "%="
   "^="
   "..="
+  "//="
 ] @operator
 
 ; Variables
