@@ -166,6 +166,10 @@
         "named": true
       },
       {
+        "type": "intersection_type",
+        "named": true
+      },
+      {
         "type": "literal_type",
         "named": true
       },
@@ -1015,6 +1019,21 @@
     }
   },
   {
+    "type": "intersection_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "literal_type",
     "named": true,
     "fields": {},
@@ -1097,7 +1116,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "object_field_type",
@@ -1781,11 +1800,11 @@
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "or",
