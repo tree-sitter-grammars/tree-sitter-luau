@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/tree-sitter-grammars/tree-sitter-luau/compare/v1.1.0...v1.2.0) (2024-06-23)
+
+
+### Features
+
+* add compound floor division operator highlight ([5aa9b88](https://github.com/tree-sitter-grammars/tree-sitter-luau/commit/5aa9b88a8e3327276ec6e72de997f04ac80b1ae4))
+* allow empty object types and add intersection type to types ([fbadc96](https://github.com/tree-sitter-grammars/tree-sitter-luau/commit/fbadc96272f718dba267628ba7b0e694c368cef3))
+* support floor division update operator ([773eae8](https://github.com/tree-sitter-grammars/tree-sitter-luau/commit/773eae82a15c50fbe295815336b625d06ee13abe))
+* support variadic types and variadic generic parameters ([09df169](https://github.com/tree-sitter-grammars/tree-sitter-luau/commit/09df1696adefcee8a4422dea85990a56e668547e))
+
+
+### Bug Fixes
+
+* **grammar:** adapt to upstream regex change ([5b088fa](https://github.com/tree-sitter-grammars/tree-sitter-luau/commit/5b088fac748f2666a315cafd1638a214388eb23e))
+
 ## [1.1.0](https://github.com/amaanq/tree-sitter-luau/compare/v1.0.0...v1.1.0) (2024-01-24)
 
 
