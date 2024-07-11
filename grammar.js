@@ -191,7 +191,7 @@ module.exports = grammar(lua, {
       $.type,
     )),
 
-    generic_type: $ => generic_type: $ => seq($.identifier, '<', commaSep(seq($.type, optional('...'))), '>'),
+    generic_type: $ => $ => seq($.identifier, '<', commaSep(seq($.type, optional('...'))), '>'),
 
     object_type: $ => seq(
       '{',
