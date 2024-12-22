@@ -307,6 +307,18 @@ module.exports = grammar(lua, {
       field('consequence', $.expression),
     ),
 
+    _binding_list: $ => commaSep1(seq(
+      field('name', $.identifier),
+      optional(seq(':', $.type)),
+    )),
+
+
+    for_generic_clause: ($) => seq(
+      alias($._binding_list, $.variable_list),
+      'in',
+      alias($._expression_list, $.expression_list),
+    ),
+
     // Luau can have hex and binary numbers, with the 0x and 0b prefixes, and can have underscores
     number: _ => {
       const decimal_digits = /[0-9][0-9_]*/;
