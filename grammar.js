@@ -147,8 +147,8 @@ module.exports = grammar(lua, {
       ',',
     ),
 
-    type: $ => prec.right(choice(
-      $.identifier,
+    type: $ => choice(
+      prec.right($.identifier),
       $.builtin_type,
       $.tuple_type,
       $.function_type,
@@ -161,7 +161,7 @@ module.exports = grammar(lua, {
       $.optional_type,
       $.literal_type,
       $.variadic_type,
-    )),
+    ),
 
     builtin_type: _ => choice(
       'thread',
@@ -190,7 +190,12 @@ module.exports = grammar(lua, {
       $.type,
     )),
 
-    generic_type: $ => seq($.identifier, '<', commaSep($.type), '>'),
+    generic_type: $ => seq(
+      $.type,
+      token(prec(1, '<')),
+      commaSep($.type),
+      '>',
+    ),
 
     object_type: $ => seq(
       '{',
