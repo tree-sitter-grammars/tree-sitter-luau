@@ -2,37 +2,36 @@
 import PackageDescription
 
 let package = Package(
-    name: "TreeSitterPuppet",
-    platforms: [.macOS(.v10_13), .iOS(.v11)],
+    name: "TreeSitterLuau",
     products: [
-        .library(name: "TreeSitterPuppet", targets: ["TreeSitterPuppet"]),
+        .library(name: "TreeSitterLuau", targets: ["TreeSitterLuau"]),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/ChimeHQ/SwiftTreeSitter", from: "0.8.0"),
+    ],
     targets: [
-        .target(name: "TreeSitterPuppet",
-                path: ".",
-                exclude: [
-                    "binding.gyp",
-                    "bindings",
-                    "Cargo.toml",
-                    "examples",
-                    "test",
-                    "grammar.js",
-                    "LICENSE",
-                    "package.json",
-                    "README.md",
-                    "script",
-                    "src/grammar.json",
-                    "src/node-types.json",
-                ],
-                sources: [
-                    "src/parser.c",
-                    "src/scanner.c",
-                ],
-                resources: [
-                    .copy("queries")
-                ],
-                publicHeadersPath: "bindings/swift",
-                cSettings: [.headerSearchPath("src")])
-    ]
+        .target(
+            name: "TreeSitterLuau",
+            dependencies: [],
+            path: ".",
+            sources: [
+                "src/parser.c",
+                "src/scanner.c",
+            ],
+            resources: [
+                .copy("queries")
+            ],
+            publicHeadersPath: "bindings/swift",
+            cSettings: [.headerSearchPath("src")]
+        ),
+        .testTarget(
+            name: "TreeSitterLuauTests",
+            dependencies: [
+                "SwiftTreeSitter",
+                "TreeSitterLuau",
+            ],
+            path: "bindings/swift/TreeSitterLuauTests"
+        )
+    ],
+    cLanguageStandard: .c11
 )
