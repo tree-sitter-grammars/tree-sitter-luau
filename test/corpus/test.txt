@@ -3,10 +3,20 @@ Generic Type
 =================
 
 type F<T> = X.Y<T>
+type Future<T...> = Future.Future<T...>
 
 ---
 
 (chunk
+  (type_definition
+    (generic_type
+      (identifier)
+      (identifier))
+    (generic_type
+      (field_type
+        (identifier)
+        (identifier))
+      (identifier)))
   (type_definition
     (generic_type
       (identifier)

@@ -193,7 +193,7 @@ module.exports = grammar(lua, {
     generic_type: $ => seq(
       $.type,
       token(prec(1, '<')),
-      commaSep($.type),
+      commaSep(seq($.type, optional('...'))),
       '>',
     ),
 
