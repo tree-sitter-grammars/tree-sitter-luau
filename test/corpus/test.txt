@@ -26,3 +26,31 @@ type Future<T...> = Future.Future<T...>
         (identifier)
         (identifier))
       (identifier))))
+
+========================
+Annotated type in loop
+========================
+
+for _, value: string in {"1", "2", "3"} do
+end
+
+---
+
+(chunk
+  (for_statement
+    (for_generic_clause
+      (variable_list
+        (identifier)
+        (identifier)
+        (builtin_type))
+      (expression_list
+        (table_constructor
+          (field
+            (string
+              (string_content)))
+          (field
+            (string
+              (string_content)))
+          (field
+            (string
+              (string_content))))))))
