@@ -368,6 +368,7 @@
   {
     "type": "chunk",
     "named": true,
+    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -1763,10 +1764,6 @@
     "named": false
   },
   {
-    "type": "goto",
-    "named": false
-  },
-  {
     "type": "hash_bang_line",
     "named": true
   },
@@ -1800,11 +1797,11 @@
   },
   {
     "type": "number",
-    "named": true
+    "named": false
   },
   {
     "type": "number",
-    "named": false
+    "named": true
   },
   {
     "type": "or",
