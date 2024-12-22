@@ -4,7 +4,7 @@ endif
 
 LANGUAGE_NAME := tree-sitter-luau
 HOMEPAGE_URL := https://github.com/tree-sitter-grammars/tree-sitter-luau
-VERSION := 1.1.0
+VERSION := 1.2.0
 
 # repository
 SRC_DIR := src

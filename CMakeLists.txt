@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-luau
-        VERSION "1.1.0"
+        VERSION "1.2.0"
         DESCRIPTION "Luau grammar for tree-sitter"
         HOMEPAGE_URL "https://github.com/tree-sitter-grammars/tree-sitter-luau"
         LANGUAGES C)
