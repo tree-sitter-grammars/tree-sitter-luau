@@ -4,9 +4,7 @@
  * @license MIT
  */
 
-/* eslint-disable arrow-parens */
-/* eslint-disable camelcase */
-/* eslint-disable-next-line spaced-comment */
+
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
@@ -34,18 +32,18 @@ const PREC = {
  *
  * @param {Rule} rule
  *
- * @return {SeqRule}
- *
+ * @returns {SeqRule}
  */
 function commaSep1(rule) {
   return sep1(rule, ',');
 }
 
 /**
-  * Creates a rule to match zero or more of the rules separated by a comma
-  * @param {Rule} rule
-  * @return {ChoiceRule}
-  */
+ * Creates a rule to match zero or more of the rules separated by a comma
+ *
+ * @param {Rule} rule
+ * @returns {ChoiceRule}
+ */
 function commaSep(rule) {
   return optional(commaSep1(rule));
 }
@@ -53,12 +51,11 @@ function commaSep(rule) {
 /**
  * Creates a rule to match one or more occurrences of `rule` separated by `sep`
  *
- * @param {RegExp|Rule|String} rule
+ * @param {RegExp | Rule | string} rule
  *
- * @param {RegExp|Rule|String} sep
+ * @param {RegExp | Rule | string} sep
  *
- * @return {SeqRule}
- *
+ * @returns {SeqRule}
  */
 function sep1(rule, sep) {
   return seq(rule, repeat(seq(sep, rule)));
@@ -68,17 +65,19 @@ function sep1(rule, sep) {
 /**
  * Creates a rule to match two or more occurrences of `rule` separated by `sep`
  *
- * @param {RegExp|Rule|String} rule
+ * @param {RegExp | Rule | string} rule
  *
- * @param {RegExp|Rule|String} sep
+ * @param {RegExp | Rule | string} sep
  *
- * @return {SeqRule}
- *
+ * @returns {SeqRule}
  */
 function sep2(rule, sep) {
   return seq(rule, repeat1(seq(sep, rule)));
 }
 
+/**
+ * @param {GrammarSymbols<string>} $
+ */
 const optional_block = $ => alias(optional($._block), $.block);
 
 module.exports = grammar(lua, {
@@ -379,9 +378,9 @@ module.exports = grammar(lua, {
     // Name
     identifier: _ => {
       const identifier_start =
-        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?\d]/;
+        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?\d]/u;
       const identifier_continue =
-        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?]*/;
+        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?]*/u;
       return token(seq(identifier_start, identifier_continue));
     },
   },

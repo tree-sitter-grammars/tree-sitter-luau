@@ -1,0 +1,35 @@
+{
+  "grammars": [
+    {
+      "name": "luau",
+      "camelcase": "Luau",
+      "scope": "source.luau",
+      "file-types": [
+        "luau"
+      ],
+      "injection-regex": "^luau$"
+    }
+  ],
+  "metadata": {
+    "version": "1.1.0",
+    "license": "MIT",
+    "description": "Luau grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Amaan Qureshi",
+        "email": "amaanq12@gmail.com"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/tree-sitter-grammars/tree-sitter-luau"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true
+  }
+}
