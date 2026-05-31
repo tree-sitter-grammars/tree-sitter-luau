@@ -1,0 +1,329 @@
+// Luau grammar for tree-sitter (native DSL).
+// Extends @muniftanjim/tree-sitter-lua (same upstream as tree-sitter-lua).
+
+let lua = inherit("../tree-sitter-lua/grammar.tsg")
+
+let PREC = {
+    ASSIGN: 0, OR: 1, AND: 2, COMPARE: 3,
+    BIT_OR: 4, BIT_NOT: 5, BIT_AND: 6, BIT_SHIFT: 7,
+    CONCAT: 8, PLUS: 9, MULTI: 10, CAST: 11,
+    UNARY: 12, POWER: 13,
+}
+
+macro sep1_of(rule: rule_t, separator: rule_t) rule_t {
+    seq(rule, repeat(seq(separator, rule)))
+}
+macro sep2_of(rule: rule_t, separator: rule_t) rule_t {
+    seq(rule, repeat1(seq(separator, rule)))
+}
+macro comma_sep1(rule: rule_t) rule_t { sep1_of(rule, ",") }
+macro comma_sep(rule: rule_t) rule_t { optional(comma_sep1(rule)) }
+
+// JS: const optional_block = $ => alias(optional($._block), $.block);
+macro optional_block() rule_t { alias(optional(_block), block) }
+
+grammar {
+    language: "luau",
+    inherits: lua,
+    // Lua's supertypes (statement, expression, declaration, variable) + type.
+    supertypes: [statement, expression, declaration, variable, type],
+}
+
+// Luau has no goto / label statements, adds update/continue/type_definition.
+override rule statement {
+    choice(
+        empty_statement, assignment_statement, function_call,
+        break_statement,
+        do_statement, while_statement, repeat_statement,
+        if_statement, for_statement, declaration,
+        update_statement, continue_statement, type_definition,
+    )
+}
+
+rule update_statement {
+    seq(
+        alias(_variable_assignment_varlist, variable_list),
+        choice("+=", "-=", "*=", "/=", "%=", "//=", "^=", "..="),
+        alias(_variable_assignment_explist, expression_list),
+    )
+}
+
+rule continue_statement { "continue" }
+
+rule type_definition {
+    seq(
+        optional("export"),
+        "type",
+        field(name, type),
+        "=",
+        choice(type, seq("typeof", "(", expression, ")")),
+    )
+}
+
+override rule _function_body {
+    seq(
+        optional(generic_type_list),
+        field(parameters, parameters),
+        optional(seq(":", type)),
+        field(body, optional_block()),
+        "end",
+    )
+}
+
+rule generic_type_list {
+    seq(
+        "<",
+        comma_sep1(seq(identifier, optional(vararg_expression))),
+        ">",
+    )
+}
+
+override rule _parameter_list { choice(comma_sep1(parameter)) }
+
+rule parameter {
+    seq(
+        choice(identifier, vararg_expression),
+        optional(seq(":", type)),
+    )
+}
+
+override rule _att_name_list {
+    sep1_of(
+        seq(
+            field(name, identifier),
+            optional(seq(":", type)),
+            optional(field(attribute, alias(_attrib, attribute))),
+        ),
+        ",",
+    )
+}
+
+rule type {
+    choice(
+        prec_right(0, identifier),
+        builtin_type, tuple_type, function_type, generic_type,
+        object_type, empty_type, field_type,
+        intersection_type, union_type, optional_type,
+        literal_type, variadic_type,
+    )
+}
+
+rule builtin_type {
+    choice(
+        "thread", "buffer", "any", "userdata", "unknown", "never",
+        "string", "number", "table", "boolean", "nil",
+    )
+}
+
+rule tuple_type { seq("(", comma_sep1(type), ")") }
+
+rule function_type {
+    prec_right(0, seq(
+        "(",
+        choice(
+            seq(comma_sep(seq(identifier, ":", type)), optional(seq(",", comma_sep(type)))),
+            comma_sep(type),
+        ),
+        ")",
+        "->",
+        type,
+    ))
+}
+
+rule generic_type {
+    seq(
+        type,
+        token(prec(1, "<")),
+        comma_sep(seq(type, optional("..."))),
+        ">",
+    )
+}
+
+rule object_type {
+    seq(
+        "{",
+        optional(choice(
+            comma_sep1(seq(choice(identifier, object_field_type), ":", type)),
+            comma_sep1(type),
+        )),
+        optional(","),
+        "}",
+    )
+}
+
+rule empty_type { seq("(", ")") }
+
+rule field_type { sep2_of(identifier, ".") }
+
+rule object_field_type { seq("[", type, "]") }
+
+rule union_type { prec_left(1, seq(type, "|", type)) }
+rule intersection_type { prec_left(2, seq(type, "&", type)) }
+rule optional_type { seq(type, "?") }
+rule literal_type { choice(string, true, false) }
+rule variadic_type { prec_right(0, seq("...", type)) }
+
+override rule expression {
+    choice(lua::expression, cast_expression, if_expression)
+}
+
+// Luau has no bitwise operators.
+override rule binary_expression {
+    choice(
+        prec_left(PREC.OR,      seq(field(left, expression), "or",   field(right, expression))),
+        prec_left(PREC.AND,     seq(field(left, expression), "and",  field(right, expression))),
+        prec_left(PREC.COMPARE, seq(field(left, expression), "<",    field(right, expression))),
+        prec_left(PREC.COMPARE, seq(field(left, expression), "<=",   field(right, expression))),
+        prec_left(PREC.COMPARE, seq(field(left, expression), "==",   field(right, expression))),
+        prec_left(PREC.COMPARE, seq(field(left, expression), "~=",   field(right, expression))),
+        prec_left(PREC.COMPARE, seq(field(left, expression), ">=",   field(right, expression))),
+        prec_left(PREC.COMPARE, seq(field(left, expression), ">",    field(right, expression))),
+        prec_left(PREC.PLUS,    seq(field(left, expression), "+",    field(right, expression))),
+        prec_left(PREC.PLUS,    seq(field(left, expression), "-",    field(right, expression))),
+        prec_left(PREC.MULTI,   seq(field(left, expression), "*",    field(right, expression))),
+        prec_left(PREC.MULTI,   seq(field(left, expression), "/",    field(right, expression))),
+        prec_left(PREC.MULTI,   seq(field(left, expression), "//",   field(right, expression))),
+        prec_left(PREC.MULTI,   seq(field(left, expression), "%",    field(right, expression))),
+        prec_right(PREC.CONCAT, seq(field(left, expression), "..",   field(right, expression))),
+        prec_right(PREC.POWER,  seq(field(left, expression), "^",    field(right, expression))),
+    )
+}
+
+override rule unary_expression {
+    prec_left(PREC.UNARY, seq(
+        choice("not", "#", "-"),
+        field(operand, expression),
+    ))
+}
+
+rule cast_expression {
+    prec(PREC.CAST, seq(expression, "::", type))
+}
+
+rule if_expression {
+    prec_right(0, seq(
+        "if",
+        field(condition, expression),
+        "then",
+        field(consequence, expression),
+        repeat(elseif_clause),
+        optional(else_clause),
+    ))
+}
+
+rule elseif_clause {
+    seq(
+        "elseif",
+        field(condition, expression),
+        "then",
+        field(consequence, expression),
+    )
+}
+
+rule else_clause {
+    seq("else", field(consequence, expression))
+}
+
+rule _binding_list {
+    comma_sep1(seq(
+        field(name, identifier),
+        optional(seq(":", type)),
+    ))
+}
+
+override rule for_generic_clause {
+    seq(
+        alias(_binding_list, variable_list),
+        "in",
+        alias(_expression_list, expression_list),
+    )
+}
+
+// Luau numbers: hex and binary, with underscores allowed.
+override rule number {
+    token(choice(
+        // decimal literal
+        choice(
+            seq(
+                regexp(r"[0-9][0-9_]*"),
+                ".",
+                optional(regexp(r"[0-9][0-9_]*")),
+                optional(seq(
+                    choice("e", "E"),
+                    seq(optional(choice("-", "+")), regexp(r"[0-9][0-9_]*")),
+                )),
+            ),
+            seq(".", regexp(r"[0-9][0-9_]*"), optional(seq(
+                choice("e", "E"),
+                seq(optional(choice("-", "+")), regexp(r"[0-9][0-9_]*")),
+            ))),
+            seq(regexp(r"[0-9][0-9_]*"), optional(seq(
+                choice("e", "E"),
+                seq(optional(choice("-", "+")), regexp(r"[0-9][0-9_]*")),
+            ))),
+        ),
+        // hex literal
+        seq(
+            choice("0x", "0X"),
+            regexp(r"[a-fA-F0-9][a-fA-F0-9_]*"),
+            optional(seq(".", regexp(r"[a-fA-F0-9][a-fA-F0-9_]*"))),
+            optional(seq(
+                choice("p", "P"),
+                seq(optional(choice("-", "+")), regexp(r"[0-9][0-9_]*")),
+            )),
+        ),
+        // binary literal
+        seq(choice("0b", "0B"), regexp(r"[0-1][0-1_]*")),
+    ))
+}
+
+override rule string {
+    choice(lua::string, _interpolated_string)
+}
+
+rule _interpolated_string {
+    seq(
+        "`",
+        repeat(choice(
+            field(content, alias(_interpolation_string_content, string_content)),
+            _escape_sequence,
+            interpolation,
+        )),
+        "`",
+    )
+}
+
+rule _interpolation_string_content {
+    choice(token_immediate(prec(1, regexp(r"[^`\{\\]+"))), "\\{")
+}
+
+rule _escape_sequence {
+    choice(
+        prec(2, token_immediate(seq("\\", regexp(r#"[^abfnrtvxu'"\\\?]"#)))),
+        prec(1, escape_sequence),
+    )
+}
+
+override rule escape_sequence {
+    token_immediate(seq(
+        "\\",
+        choice(
+            regexp(r"[^xu0-7]"),
+            regexp(r"[0-7]{1,3}"),
+            regexp(r"x[0-9a-fA-F]{2}"),
+            regexp(r"u[0-9a-fA-F]{4}"),
+            regexp(r"u\{[0-9a-fA-F]+\}"),
+            regexp(r"U[0-9a-fA-F]{8}"),
+        ),
+    ))
+}
+
+rule interpolation { seq("{", expression, "}") }
+
+// Luau identifier (matches JS-style character classes via Unicode properties).
+override rule identifier {
+    token(seq(
+        regexp(r#"[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?\d]"#),
+        regexp(r#"[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?]*"#),
+    ))
+}
