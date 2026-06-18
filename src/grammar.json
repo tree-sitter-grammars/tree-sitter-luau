@@ -143,6 +143,10 @@
         {
           "type": "SYMBOL",
           "name": "type_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "const_statement"
         }
       ]
     },
@@ -2950,6 +2954,38 @@
         }
       ]
     },
+    "const_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "const"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_att_name_list"
+              },
+              "named": true,
+              "value": "variable_list"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_local_variable_assignment"
+              },
+              "named": true,
+              "value": "assignment_statement"
+            }
+          ]
+        }
+      ]
+    },
     "update_statement": {
       "type": "SEQ",
       "members": [
@@ -4242,5 +4278,6 @@
     "declaration",
     "variable",
     "type"
-  ]
+  ],
+  "reserved": {}
 }
