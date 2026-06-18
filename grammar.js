@@ -96,6 +96,15 @@ module.exports = grammar(lua, {
       $.update_statement,
       $.continue_statement,
       $.type_definition,
+      $.const_statement,
+    ),
+
+    const_statement: $ => seq(
+      'const',
+      choice(
+        alias($._att_name_list, $.variable_list),
+        alias($._local_variable_assignment, $.assignment_statement),
+      ),
     ),
 
     update_statement: $ => seq(
