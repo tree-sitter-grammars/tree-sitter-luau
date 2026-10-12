@@ -149,8 +149,7 @@
 (type_definition
   "type"
   .
-  (type) @type.definition
-  "=")
+  (identifier) @type.definition)
 
 ; Constants
 ((identifier) @constant

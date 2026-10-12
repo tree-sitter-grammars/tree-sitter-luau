@@ -9,8 +9,8 @@ type Future<T...> = Future.Future<T...>
 
 (chunk
   (type_definition
-    (generic_type
-      (identifier)
+    (identifier)
+    (generic_type_list_with_defaults
       (identifier))
     (generic_type
       (field_type
@@ -18,14 +18,16 @@ type Future<T...> = Future.Future<T...>
         (identifier))
       (identifier)))
   (type_definition
-    (generic_type
+    (identifier)
+    (generic_type_list_with_defaults
       (identifier)
-      (identifier))
+      (vararg_expression))
     (generic_type
       (field_type
         (identifier)
         (identifier))
-      (identifier))))
+      (generic_type_pack
+        (identifier)))))
 
 ========================
 Annotated type in loop
@@ -54,3 +56,478 @@ end
           (field
             (string
               (string_content))))))))
+
+=================
+Read write qualifiers
+=================
+
+type Account = {
+  read balance: number,
+  write owner: Player,
+  read [string]: number,
+}
+
+---
+
+(chunk
+  (type_definition
+    (identifier)
+    (object_type
+      (identifier)
+      (builtin_type)
+      (identifier)
+      (identifier)
+      (object_field_type
+        (builtin_type))
+      (builtin_type))))
+
+=================
+Semicolon fieldsep in table type
+=================
+
+type Mixed = { a: number; b: string; }
+
+---
+
+(chunk
+  (type_definition
+    (identifier)
+    (object_type
+      (identifier)
+      (builtin_type)
+      (identifier)
+      (builtin_type))))
+
+=================
+Generic type packs
+=================
+
+type Fn<T...> = (T...) -> T...
+
+local function fn<T...>(...: T...): T...
+	return ...
+end
+
+---
+
+(chunk
+  (type_definition
+    (identifier)
+    (generic_type_list_with_defaults
+      (identifier)
+      (vararg_expression))
+    (function_type
+      (generic_type_pack
+        (identifier))
+      (generic_type_pack
+        (identifier))))
+  (function_declaration
+    (identifier)
+    (generic_type_list
+      (identifier)
+      (vararg_expression))
+    (parameters
+      (parameter
+        (vararg_expression)
+        (generic_type_pack
+          (identifier))))
+    (generic_type_pack
+      (identifier))
+    (block
+      (return_statement
+        (expression_list
+          (vararg_expression))))))
+
+=================
+Generic type parameter defaults
+=================
+
+type Result<T, E = string> = { ok: T } | { err: E }
+
+type Packed<T... = ...number> = T...
+
+---
+
+(chunk
+  (type_definition
+    (identifier)
+    (generic_type_list_with_defaults
+      (identifier)
+      (identifier)
+      (builtin_type))
+    (union_type
+      (object_type
+        (identifier)
+        (identifier))
+      (object_type
+        (identifier)
+        (identifier))))
+  (type_definition
+    (identifier)
+    (generic_type_list_with_defaults
+      (identifier)
+      (vararg_expression)
+      (variadic_type
+        (builtin_type)))
+    (generic_type_pack
+      (identifier))))
+
+=================
+Type function
+=================
+
+export type function serialize<T>(value: T): string
+	return `ser({value})`
+end
+
+---
+
+(chunk
+  (type_function
+    (identifier)
+    (generic_type_list
+      (identifier))
+    (parameters
+      (parameter
+        (identifier)
+        (identifier)))
+    (builtin_type)
+    (block
+      (return_statement
+        (expression_list
+          (string
+            (string_content)
+            (interpolation
+              (identifier))
+            (string_content)))))))
+
+=================
+Attributes
+=================
+
+@native function step(dt: number)
+end
+
+@checked local function guarded(x: number): boolean
+	return x > 0
+end
+
+local handler = @native function(x)
+	return x
+end
+
+@[deprecated("use newThing", { since = "1.2" })]
+function oldThing()
+end
+
+---
+
+(chunk
+  (function_declaration
+    (attribute
+      (identifier))
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (builtin_type))))
+  (function_declaration
+    (attribute
+      (identifier))
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (builtin_type)))
+    (builtin_type)
+    (block
+      (return_statement
+        (expression_list
+          (binary_expression
+            (identifier)
+            (number))))))
+  (variable_declaration
+    (assignment_statement
+      (variable_list
+        (identifier))
+      (expression_list
+        (function_definition
+          (attribute
+            (identifier))
+          (parameters
+            (parameter
+              (identifier)))
+          (block
+            (return_statement
+              (expression_list
+                (identifier))))))))
+  (function_declaration
+    (attribute
+      (parattr
+        (identifier)
+        (attribute_arguments
+          (string
+            (string_content))
+          (identifier)
+          (string
+            (string_content)))))
+    (identifier)
+    (parameters)))
+
+=================
+Declare function
+=================
+
+declare function warn<T...>(...: T...): ()
+
+---
+
+(chunk
+  (declare_statement
+    (identifier)
+    (generic_type_list
+      (identifier)
+      (vararg_expression))
+    (parameters
+      (parameter
+        (vararg_expression)
+        (generic_type_pack
+          (identifier))))
+    (empty_type)))
+
+=================
+Declare global
+=================
+
+declare game: DataModel
+
+---
+
+(chunk
+  (declare_statement
+    (identifier)
+    (identifier)))
+
+=================
+Declare extern type
+=================
+
+declare extern type Instance extends RBXScriptSignal
+	read Name: string
+	Parent: Instance?
+	function FindFirstChild(self, name: string): Instance?
+	["UserData"]: buffer
+	[Instance]: number
+end
+
+---
+
+(chunk
+  (declare_statement
+    (identifier)
+    (identifier)
+    (declare_member
+      (identifier)
+      (builtin_type))
+    (declare_member
+      (identifier)
+      (optional_type
+        (identifier)))
+    (declare_member
+      (identifier)
+      (parameters
+        (parameter
+          (identifier))
+        (parameter
+          (identifier)
+          (builtin_type)))
+      (optional_type
+        (identifier)))
+    (declare_member
+      (object_field_type
+        (literal_type
+          (string
+            (string_content))))
+      (builtin_type))
+    (declare_member
+      (object_field_type
+        (identifier))
+      (builtin_type))))
+
+=================
+Declare class
+=================
+
+declare class LegacyService
+	AutoSave: boolean
+	function Save(self): boolean
+end
+
+---
+
+(chunk
+  (declare_statement
+    (identifier)
+    (declare_member
+      (identifier)
+      (builtin_type))
+    (declare_member
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)))
+      (builtin_type))))
+
+=================
+Const statements
+=================
+
+const MAX_RETRIES: number = 3
+const VERSION = "1.0"
+
+const function greet(name: string): string
+	return `hi {name}`
+end
+
+@native const function fast(x: number)
+end
+
+---
+
+(chunk
+  (const_statement
+    (assignment_statement
+      (variable_list
+        (identifier)
+        (builtin_type))
+      (expression_list
+        (number))))
+  (const_statement
+    (assignment_statement
+      (variable_list
+        (identifier))
+      (expression_list
+        (string
+          (string_content)))))
+  (const_statement
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (builtin_type)))
+    (builtin_type)
+    (block
+      (return_statement
+        (expression_list
+          (string
+            (string_content)
+            (interpolation
+              (identifier)))))))
+  (const_statement
+    (attribute
+      (identifier))
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (builtin_type)))))
+
+=================
+Typeof in type position
+=================
+
+local x: typeof(t) = t
+local y: typeof(t)? = nil
+type S = typeof(t)
+type K = keyof<typeof(t)>
+type T = typeof(t)?
+type U = typeof(t) | string
+type F = (typeof(t)) -> typeof(t)
+type O = { a: typeof(t) }
+function f(a: typeof(t)?): typeof(t) return a end
+local z = v :: typeof(t)
+local after = 1
+
+---
+
+(chunk
+  (variable_declaration
+    (assignment_statement
+      (variable_list
+        (identifier)
+        (typeof_type
+          (identifier)))
+      (expression_list
+        (identifier))))
+  (variable_declaration
+    (assignment_statement
+      (variable_list
+        (identifier)
+        (optional_type
+          (typeof_type
+            (identifier))))
+      (expression_list
+        (nil))))
+  (type_definition
+    (identifier)
+    (typeof_type
+      (identifier)))
+  (type_definition
+    (identifier)
+    (generic_type
+      (identifier)
+      (typeof_type
+        (identifier))))
+  (type_definition
+    (identifier)
+    (optional_type
+      (typeof_type
+        (identifier))))
+  (type_definition
+    (identifier)
+    (union_type
+      (typeof_type
+        (identifier))
+      (builtin_type)))
+  (type_definition
+    (identifier)
+    (function_type
+      (typeof_type
+        (identifier))
+      (typeof_type
+        (identifier))))
+  (type_definition
+    (identifier)
+    (object_type
+      (identifier)
+      (typeof_type
+        (identifier))))
+  (function_declaration
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (optional_type
+          (typeof_type
+            (identifier)))))
+    (typeof_type
+      (identifier))
+    (block
+      (return_statement
+        (expression_list
+          (identifier)))))
+  (variable_declaration
+    (assignment_statement
+      (variable_list
+        (identifier))
+      (expression_list
+        (cast_expression
+          (identifier)
+          (typeof_type
+            (identifier))))))
+  (variable_declaration
+    (assignment_statement
+      (variable_list
+        (identifier))
+      (expression_list
+        (number)))))

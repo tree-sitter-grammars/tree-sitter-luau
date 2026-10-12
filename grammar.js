@@ -76,6 +76,17 @@ function sep2(rule, sep) {
 }
 
 /**
+ * Creates a rule to match one or more of the rules separated by a comma or semicolon (Luau fieldsep)
+ *
+ * @param {Rule} rule
+ *
+ * @returns {SeqRule}
+ */
+function fieldsepSep1(rule) {
+  return seq(rule, repeat(seq(choice(',', ';'), rule)));
+}
+
+/**
  * @param {GrammarSymbols<string>} $
  */
 const optional_block = $ => alias(optional($._block), $.block);
@@ -96,6 +107,67 @@ module.exports = grammar(lua, {
       $.update_statement,
       $.continue_statement,
       $.type_definition,
+      $.type_function,
+      $.declare_statement,
+      $.const_statement,
+    ),
+
+    const_statement: $ => choice(
+      seq(
+        repeat($.attribute),
+        'const',
+        'function',
+        field('name', $.identifier),
+        $._function_body,
+      ),
+      seq('const', alias($._local_variable_assignment, $.assignment_statement)),
+    ),
+
+    function_declaration: ($) =>
+      seq(repeat($.attribute), 'function', field('name', $._function_name), $._function_body),
+    _local_function_declaration: ($) =>
+      seq(repeat($.attribute), 'local', 'function', field('name', $.identifier), $._function_body),
+
+    function_definition: ($) => seq(repeat($.attribute), 'function', $._function_body),
+
+    attribute: $ => choice(
+      seq('@', field('attribute_name', alias(token.immediate(/[a-zA-Z_][a-zA-Z0-9_]*/), $.identifier))),
+      seq('@[', commaSep1($.parattr), ']'),
+    ),
+
+    parattr: $ => seq(
+      field('attribute_name', $.identifier),
+      optional($.attribute_arguments),
+    ),
+
+    attribute_arguments: $ => choice(
+      seq('(', optional(commaSep1($._attribute_literal)), ')'),
+      $._attribute_littable,
+      $.string,
+    ),
+
+    _attribute_literal: $ => choice(
+      'nil',
+      'false',
+      'true',
+      $.number,
+      $.string,
+      $._attribute_littable,
+    ),
+
+    _attribute_littable: $ => seq(
+      '{',
+      optional(seq(
+        $._attribute_litfield,
+        repeat(seq(choice(',', ';'), $._attribute_litfield)),
+        optional(choice(',', ';')),
+      )),
+      '}',
+    ),
+
+    _attribute_litfield: $ => seq(
+      optional(seq($.identifier, '=')),
+      $._attribute_literal,
     ),
 
     update_statement: $ => seq(
@@ -109,11 +181,79 @@ module.exports = grammar(lua, {
     type_definition: $ => seq(
       optional('export'),
       'type',
-      field('name', $.type),
+      field('name', $.identifier),
+      optional(field('generic_parameters', $.generic_type_list_with_defaults)),
       '=',
-      choice(
+      $.type,
+    ),
+
+    type_function: $ => seq(
+      optional('export'),
+      'type',
+      'function',
+      field('name', $.identifier),
+      $._function_body,
+    ),
+
+    generic_type_list_with_defaults: $ => seq(
+      '<',
+      commaSep1($._generic_type_parameter),
+      '>',
+    ),
+    _generic_type_parameter: $ => choice(
+      seq($.identifier, optional(seq('=', $.type))),
+      seq($.identifier, $.vararg_expression, optional(seq('=', $.type))),
+    ),
+
+    declare_statement: $ => choice(
+      seq(
+        repeat($.attribute),
+        'declare',
+        'function',
+        field('name', $.identifier),
+        optional($.generic_type_list),
+        field('parameters', $.parameters),
+        optional(seq(':', $.type)),
+      ),
+      seq(
+        'declare',
+        'extern',
+        'type',
+        field('name', $.identifier),
+        optional(seq('extends', field('super', $.type))),
+        optional('with'),
+        repeat($.declare_member),
+        'end',
+      ),
+      seq(
+        'declare',
+        'class',
+        field('name', $.identifier),
+        optional(seq('extends', field('super', $.type))),
+        repeat($.declare_member),
+        'end',
+      ),
+      seq(
+        'declare',
+        field('name', $.identifier),
+        ':',
+        field('type', $.type),
+      ),
+    ),
+
+    declare_member: $ => choice(
+      seq(
+        optional(repeat($.attribute)),
+        'function',
+        field('name', $.identifier),
+        field('parameters', $.parameters),
+        optional(seq(':', $.type)),
+      ),
+      seq(
+        optional(field('access_qualifier', choice('read', 'write'))),
+        choice($.identifier, $.object_field_type),
+        ':',
         $.type,
-        seq('typeof', '(', $.expression, ')'),
       ),
     ),
 
@@ -153,6 +293,7 @@ module.exports = grammar(lua, {
       $.tuple_type,
       $.function_type,
       $.generic_type,
+      $.generic_type_pack,
       $.object_type,
       $.empty_type,
       $.field_type,
@@ -161,7 +302,10 @@ module.exports = grammar(lua, {
       $.optional_type,
       $.literal_type,
       $.variadic_type,
+      $.typeof_type,
     ),
+
+    typeof_type: $ => seq('typeof', '(', $.expression, ')'),
 
     builtin_type: _ => choice(
       'thread',
@@ -193,19 +337,24 @@ module.exports = grammar(lua, {
     generic_type: $ => seq(
       $.type,
       token(prec(1, '<')),
-      commaSep(seq($.type, optional('...'))),
+      commaSep($.type),
       '>',
     ),
+
+    generic_type_pack: $ => seq($.identifier, '...'),
 
     object_type: $ => seq(
       '{',
       optional(choice(
-        commaSep1(
-          seq(choice($.identifier, $.object_field_type), ':', $.type),
-        ),
-        commaSep1($.type),
+        fieldsepSep1(seq(
+          optional(field('access_qualifier', choice('read', 'write'))),
+          choice($.identifier, $.object_field_type),
+          ':',
+          $.type,
+        )),
+        fieldsepSep1($.type),
       )),
-      optional(','),
+      optional(choice(',', ';')),
       '}',
     ),
 
@@ -395,9 +544,9 @@ module.exports = grammar(lua, {
     // Name
     identifier: _ => {
       const identifier_start =
-        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?\d]/u;
+        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?@\d]/u;
       const identifier_continue =
-        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?]*/u;
+        /[^\p{Control}\s+\-*/%^#&~|<>=(){}\[\];:,.\\'"`?@]*/u;
       return token(seq(identifier_start, identifier_continue));
     },
   },
