@@ -1,2 +1,5 @@
 ; inherits: lua
-(object_type) @fold
+[
+  (object_type)
+  (type_function)
+] @fold

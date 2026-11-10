@@ -8,6 +8,7 @@
   (for_statement)
   (function_declaration)
   (function_definition)
+  (type_function)
 ] @local.scope
 
 ; References
