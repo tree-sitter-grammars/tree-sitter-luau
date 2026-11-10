@@ -1,2 +1,5 @@
 ; inherits: lua
-(object_type) @indent.begin
+[
+  (object_type)
+  (type_function)
+] @indent.begin

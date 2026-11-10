@@ -54,3 +54,37 @@ end
           (field
             (string
               (string_content))))))))
+
+=================
+Type function
+=================
+
+type function name(a, b)
+  -- body
+end
+
+export type function foo()
+  return types.number
+end
+
+---
+
+(chunk
+  (type_function
+    (identifier)
+    (parameters
+      (parameter
+        (identifier))
+      (parameter
+        (identifier)))
+    (comment
+      (comment_content)))
+  (type_function
+    (identifier)
+    (parameters)
+    (block
+      (return_statement
+        (expression_list
+          (dot_index_expression
+            (identifier)
+            (identifier)))))))

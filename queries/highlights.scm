@@ -90,6 +90,12 @@
     "end"
   ] @keyword.function)
 
+(type_function
+  [
+    "function"
+    "end"
+  ] @keyword.function)
+
 ; Operators
 [
   "and"
@@ -151,6 +157,9 @@
   .
   (type) @type.definition
   "=")
+
+(type_function
+  name: (identifier) @type.definition)
 
 ; Constants
 ((identifier) @constant

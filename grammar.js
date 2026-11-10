@@ -96,6 +96,7 @@ module.exports = grammar(lua, {
       $.update_statement,
       $.continue_statement,
       $.type_definition,
+      $.type_function,
     ),
 
     update_statement: $ => seq(
@@ -115,6 +116,14 @@ module.exports = grammar(lua, {
         $.type,
         seq('typeof', '(', $.expression, ')'),
       ),
+    ),
+
+    type_function: $ => seq(
+      optional('export'),
+      'type',
+      'function',
+      field('name', $.identifier),
+      $._function_body,
     ),
 
     _function_body: $ => seq(
